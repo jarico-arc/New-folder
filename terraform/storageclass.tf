@@ -3,7 +3,7 @@ resource "kubernetes_storage_class" "pd_ssd_regional" {
     name = "pd-ssd-regional"
   }
 
-  provisioner          = "pd.csi.storage.gke.io"
+  storage_provisioner  = "pd.csi.storage.gke.io"
   parameters = {
     type             = "pd-ssd"
     replication-type = "regional-pd"

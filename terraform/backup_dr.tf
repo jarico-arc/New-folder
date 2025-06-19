@@ -117,15 +117,13 @@ resource "google_container_cluster" "dr" {
   remove_default_node_pool = true
   node_locations           = ["us-east1-b", "us-east1-c", "us-east1-d"]
 
-  enable_network_policy = true
+  network_policy {
+    enabled = true
+  }
   enable_shielded_nodes = true
 
   workload_identity_config {
     workload_pool = "${var.project_id}.svc.id.goog"
-  }
-
-  ip_allocation_policy {
-    create_subnetwork = false
   }
 
   vertical_pod_autoscaling {

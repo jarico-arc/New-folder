@@ -8,7 +8,9 @@ resource "google_container_cluster" "prod" {
   remove_default_node_pool = true
   node_locations           = var.zones
 
-  enable_network_policy    = true
+  network_policy {
+    enabled = true
+  }
   enable_shielded_nodes    = true
 
   workload_identity_config {
@@ -17,26 +19,6 @@ resource "google_container_cluster" "prod" {
 
   release_channel {
     channel = "REGULAR"
-  }
-
-  cluster_autoscaling {
-    enable_node_autoprovisioning = true
-
-    resource_limits {
-      resource_type = "cpu"
-      minimum       = 0
-      maximum       = 2000
-    }
-
-    resource_limits {
-      resource_type = "memory"
-      minimum       = 0
-      maximum       = 6144000
-    }
-  }
-
-  ip_allocation_policy {
-    create_subnetwork = false
   }
 
   vertical_pod_autoscaling {

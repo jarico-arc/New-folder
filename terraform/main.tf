@@ -21,15 +21,14 @@ resource "google_container_cluster" "dev" {
 
   node_locations = var.zones
 
-  enable_network_policy = true
+  network_policy {
+    enabled = true
+  }
+
   enable_shielded_nodes = true
 
   workload_identity_config {
     workload_pool = "${var.project_id}.svc.id.goog"
-  }
-
-  ip_allocation_policy {
-    create_subnetwork = false
   }
 
   vertical_pod_autoscaling {
