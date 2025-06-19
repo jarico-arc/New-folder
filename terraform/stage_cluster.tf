@@ -63,7 +63,11 @@ resource "google_container_node_pool" "stage_spot" {
     machine_type = "e2-medium"
     preemptible  = true
     labels       = { tier = "spot" }
-    taints       = [{ key = "spot", value = "true", effect = "PreferNoSchedule" }]
+    taint {
+      key    = "spot"
+      value  = "true"
+      effect = "PreferNoSchedule"
+    }
     oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
   }
 
