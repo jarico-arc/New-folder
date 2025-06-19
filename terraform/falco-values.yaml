@@ -1,0 +1,17 @@
+# Falco Helm values configuration
+# Customize as needed for security policies, outputs, and integrations.
+
+# Example: Enable Kubernetes audit logs
+falco:
+  enabled: true
+  rulesFile:
+    - /etc/falco/falco_rules.yaml
+
+# Example: Output to stdout and file
+outputs:
+  - name: stdout
+    enabled: true
+  - name: file
+    enabled: true
+    keep_alive: false
+    filename: /var/log/falco/falco.log

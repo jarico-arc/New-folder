@@ -1,0 +1,60 @@
+# values for YugabyteDB Helm chart
+replicaCount:
+  master: 3
+  tserver: 5
+
+resources:
+  master:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+  tserver:
+    requests:
+      cpu: "1"
+      memory: "4Gi"
+
+placement:
+  cloud: gcp
+  region: us-central1
+  zones:
+    - us-central1-a
+    - us-central1-b
+    - us-central1-c
+
+storage:
+  master:
+    count: 1
+    size: 100Gi
+    storageClass: pd-ssd-regional
+  tserver:
+    count: 1
+    size: 500Gi
+    storageClass: pd-ssd-regional
+
+tserverGFlags:
+  enable_ysql: "true"
+  ysql_enable_auth: "true"
+  enable_automatic_tablet_splitting: "true"
+  tablet_split_low_phase_size_threshold_bytes: "536870912"
+  tablet_split_high_phase_size_threshold_bytes: "10737418240"
+
+rbac:
+  create: true
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "9300"
+
+pdb:
+  master:
+    maxUnavailable: 1
+  tserver:
+    maxUnavailable: 1
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            component: yb-master
+        topologyKey: "kubernetes.io/hostname" 

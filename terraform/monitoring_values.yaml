@@ -1,0 +1,83 @@
+# Values for kube-prometheus-stack
+prometheusOperator:
+  createCustomResource: true
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector:
+      matchExpressions:
+        - key: app
+          operator: In
+          values: ["yb-monitor", "redpanda-monitor", "debezium-monitor"]
+    ruleSelector:
+      matchLabels:
+        role: alert-rules
+
+alertmanager:
+  alertmanagerSpec:
+    route:
+      groupBy: ["alertname"]
+      groupWait: 30s
+      groupInterval: 5m
+      repeatInterval: 1h
+      receiver: pagerduty
+    receivers:
+      - name: slack
+        slackConfigs:
+          - apiUrl: "<SLACK_WEBHOOK_URL>"
+            channel: "#alerts"
+      - name: pagerduty
+        pagerDutyConfigs:
+          - serviceKey: "<PAGERDUTY_SERVICE_KEY>"
+
+serviceMonitors:
+  - name: yb-monitor
+    selector:
+      matchLabels:
+        prometheus.io/scrape: "true"
+    namespaceSelector:
+      matchNames: ["yb-prod"]
+    endpoints:
+      - port: "9300"
+        interval: 30s
+  - name: redpanda-monitor
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: redpanda
+    namespaceSelector:
+      matchNames: ["kafka"]
+    endpoints:
+      - port: "metrics"
+        interval: 30s
+  - name: debezium-monitor
+    selector:
+      matchLabels:
+        app: debezium
+    namespaceSelector:
+      matchNames: ["kafka"]
+    endpoints:
+      - port: "8083"
+        path: "/metrics"
+        interval: 30s
+
+prometheusRule:
+  groups:
+    - name: slo-burn-rate
+      rules:
+        - alert: HighSLOBurnRate5m
+          expr: |
+            sum(rate(slo_error_budget_burned[5m])) by (service) > 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{ $labels.service }} SLO burn rate high over 5m"
+        - alert: HighSLOBurnRate1h
+          expr: |
+            sum(rate(slo_error_budget_burned[1h])) by (service) > 1
+          for: 1h
+          labels:
+            severity: critical
+          annotations:
+            summary: "{{ $labels.service }} SLO burn rate high over 1h" 

@@ -1,0 +1,3 @@
+# Cloud Carbon Footprint exporter values
+# By default, scrape all namespaces; override as needed.
+namespaces: []
