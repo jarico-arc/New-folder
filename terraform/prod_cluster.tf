@@ -72,7 +72,7 @@ resource "google_container_node_pool" "prod_spot" {
     taint {
       key    = "spot"
       value  = "true"
-      effect = "PreferNoSchedule"
+      effect = "PREFER_NO_SCHEDULE"
     }
     oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
   }
